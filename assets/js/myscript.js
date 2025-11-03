@@ -1,15 +1,31 @@
 ﻿// Initialize interactions after the DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Mobile menu toggle
+  // Mobile menu toggle (drawer)
   const mobileMenuButton = document.querySelector('.mobile-toggle');
   const mobileMenu = document.querySelector('.mobile-menu');
+  const mobileBackdrop = document.querySelector('.mobile-menu__backdrop');
+
+  const setMobileState = (open) => {
+    if (!mobileMenuButton || !mobileMenu) return;
+    mobileMenu.classList.toggle('open', open);
+    mobileMenuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+    mobileMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+    document.body.style.overflow = open ? 'hidden' : '';
+    if (!open) {
+      mobileMenuButton.focus();
+    }
+  };
 
   if (mobileMenuButton && mobileMenu) {
     mobileMenuButton.addEventListener('click', () => {
-      const isOpen = mobileMenu.classList.toggle('open');
-      mobileMenuButton.setAttribute('aria-expanded', (isOpen).toString());
+      const isOpen = !mobileMenu.classList.contains('open');
+      setMobileState(isOpen);
     });
   }
+  // No backdrop click needed (compact dropdown)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileMenu && mobileMenu.classList.contains('open')) setMobileState(false);
+  });
 
   // Smooth scrolling for in-page links (skip modal triggers and dummy # links)
   document.querySelectorAll('a[href^="#"]:not([data-modal])').forEach(anchor => {
@@ -21,8 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (target) {
         e.preventDefault();
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (mobileMenu) mobileMenu.classList.remove('open');
-        if (mobileMenuButton) mobileMenuButton.setAttribute('aria-expanded', 'false');
+        if (mobileMenu) setMobileState(false);
         // If navigating to services, hint the reveal a moment after scroll starts
         if (href === '#services') {
           setTimeout(() => { target.classList.add('in-view'); }, 250);
@@ -30,6 +45,71 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // Keep header style constant on scroll (no scrolled state)
+  const header = document.querySelector('.site-header');
+  if (header) header.classList.remove('scrolled');
+
+  // Pro nav indicator + active-link sync
+  const navLinksWrap = document.querySelector('.nav-links');
+  const navLinks = Array.from(document.querySelectorAll('.nav-links .nav-link'));
+  const indicator = document.querySelector('.nav-indicator');
+
+  const setActiveLink = (el) => {
+    navLinks.forEach(a => a.classList.toggle('active', a === el));
+    if (navLinksWrap && el && indicator) {
+      const rect = el.getBoundingClientRect();
+      const parent = navLinksWrap.getBoundingClientRect();
+      const x = rect.left - parent.left;
+      const w = rect.width;
+      navLinksWrap.style.setProperty('--indicator-x', `${x}px`);
+      navLinksWrap.style.setProperty('--indicator-w', `${w}px`);
+    }
+  };
+
+  // Initialize indicator to current hash/first item
+  if (navLinks.length) {
+    const byHash = () => navLinks.find(a => a.getAttribute('href') === (location.hash || '#home')) || navLinks[0];
+    setActiveLink(byHash());
+
+    // Hover/focus moves indicator
+    navLinks.forEach(link => {
+      link.addEventListener('mouseenter', () => setActiveLink(link));
+      link.addEventListener('focus', () => setActiveLink(link));
+    });
+    // Mouse leaving the bar restores to section in view
+    navLinksWrap && navLinksWrap.addEventListener('mouseleave', () => {
+      const current = document.querySelector('.nav-link.active') || byHash();
+      current && setActiveLink(current);
+    });
+    window.addEventListener('resize', () => {
+      const current = document.querySelector('.nav-link.active') || byHash();
+      current && setActiveLink(current);
+    });
+  }
+
+  // Active link by section in view
+  if ('IntersectionObserver' in window && navLinks.length) {
+    const map = new Map();
+    navLinks.forEach(a => {
+      const href = a.getAttribute('href') || '';
+      if (href.startsWith('#')) {
+        try {
+          const target = document.querySelector(href);
+          if (target) map.set(target, a);
+        } catch (_) {}
+      }
+    });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const a = map.get(entry.target);
+          if (a) setActiveLink(a);
+        }
+      });
+    }, { threshold: 0.6 });
+    map.forEach((_, section) => observer.observe(section));
+  }
 
   // Enhanced contact form UX (validation + inline messaging)
   const form = document.querySelector('.contact-form');
@@ -338,4 +418,3 @@ document.addEventListener('DOMContentLoaded', () => {
   initSlider('pricing');
   initSlider('why');
 });
-
