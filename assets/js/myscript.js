@@ -28,29 +28,37 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Smooth scrolling for in-page links
-  // Important: DO NOT scroll/navigate for links inside the mobile menu.
+  // Mobile drawer: close then scroll to target
   document.querySelectorAll('a[href^="#"]:not([data-modal])').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
       const href = anchor.getAttribute('href') || '';
       if (href === '#' || href.trim() === '') return;
 
-      // If the link lives inside the mobile drawer, hard-close and stay put
+      // If the link lives inside the mobile drawer, close and scroll
       const inMobileMenu = anchor.closest('#mobile-menu') || anchor.closest('.mobile-menu');
       if (inMobileMenu) {
         e.preventDefault();
         if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
-        // Hard close: remove any open/active/closing flags and restore body state
-        try {
-          inMobileMenu.classList.remove('open', 'active', 'closing');
-        } catch (_) {}
-        if (mobileMenu) {
-          mobileMenu.classList.remove('open', 'active', 'closing');
-          mobileMenu.setAttribute('aria-hidden', 'true');
+        let target = null;
+        try { target = document.querySelector(href); } catch (_) { target = null; }
+        // Close via the centralized state setter
+        setMobileState(false);
+        // Sync nav indicator to this target immediately
+        if (Array.isArray(navLinks)) {
+          const navA = navLinks.find(a => (a.getAttribute('href') || '') === href);
+          navA && setActiveLink(navA);
         }
-        if (mobileMenuButton) mobileMenuButton.setAttribute('aria-expanded', 'false');
-        document.body.classList.remove('menu-open', 'nav-open');
-        document.body.style.overflow = '';
-        return; // Do not scroll
+        // Scroll after a short tick so layout settles
+        if (target) {
+          setTimeout(() => {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            try { history.replaceState(null, '', href); } catch (_) {}
+            if (href === '#services') {
+              setTimeout(() => { target.classList.add('in-view'); }, 250);
+            }
+          }, 50);
+        }
+        return;
       }
 
       // For regular in-page links outside the mobile drawer, smooth scroll
@@ -59,6 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (target) {
         e.preventDefault();
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Sync nav indicator when clicking desktop nav links
+        if (Array.isArray(navLinks)) {
+          const navA = navLinks.find(a => (a.getAttribute('href') || '') === href);
+          navA && setActiveLink(navA);
+        }
+        try { history.replaceState(null, '', href); } catch (_) {}
         if (mobileMenu) setMobileState(false);
         if (href === '#services') {
           setTimeout(() => { target.classList.add('in-view'); }, 250);
@@ -105,6 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     window.addEventListener('resize', () => {
       const current = document.querySelector('.nav-link.active') || byHash();
+      current && setActiveLink(current);
+    });
+    // Sync indicator on URL hash changes (e.g., back/forward)
+    window.addEventListener('hashchange', () => {
+      const current = byHash();
       current && setActiveLink(current);
     });
   }
@@ -550,32 +569,33 @@ document.addEventListener('DOMContentLoaded', () => {
     var header = document.querySelector('header');
     var nav = document.querySelector('nav');
     var menus = document.querySelectorAll('.nav-menu, .mobile-menu, .navbar-nav');
-    var hasAnyOpen = false;
+
+    // Immediately hide any open menus, no visible flash
     menus.forEach(function (el) {
       if (el.classList.contains('open') || el.classList.contains('active')) {
-        hasAnyOpen = true;
         el.classList.add('closing');
-      }
-    });
-    // If nothing is open, nothing to do
-    if (!hasAnyOpen && !body.classList.contains('menu-open') && !body.classList.contains('nav-open')) return;
-
-    setTimeout(function () {
-      menus.forEach(function (el) {
-        el.classList.remove('closing');
         el.classList.remove('open');
         el.classList.remove('active');
-        var togglerId = el.getAttribute('aria-labelledby');
-        if (togglerId) {
-          var tg = document.getElementById(togglerId);
-          if (tg) tg.setAttribute('aria-expanded', 'false');
+        if (el.id === 'mobile-menu') {
+          el.setAttribute('aria-hidden', 'true');
         }
-      });
-      body.classList.remove('menu-open');
-      body.classList.remove('nav-open');
-      if (header) header.classList.remove('nav-open');
-      if (nav) nav.classList.remove('open');
-    }, 200); // match CSS navSlideOut duration
+      }
+      var togglerId = el.getAttribute('aria-labelledby');
+      if (togglerId) {
+        var tg = document.getElementById(togglerId);
+        if (tg) tg.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Reset global open flags right away
+    body.classList.remove('menu-open', 'nav-open');
+    if (header) header.classList.remove('nav-open');
+    if (nav) nav.classList.remove('open');
+
+    // Clear transient 'closing' class shortly after (no visual change)
+    setTimeout(function () {
+      menus.forEach(function (el) { el.classList.remove('closing'); });
+    }, 150);
   }
 
   function bindEnhancedHandlers() {
@@ -594,7 +614,46 @@ document.addEventListener('DOMContentLoaded', () => {
         function (e) {
           e.preventDefault();
           if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+          var href = (this && this.getAttribute) ? (this.getAttribute('href') || '') : '';
+          var tgt = (this && this.getAttribute) ? (this.getAttribute('target') || '') : '';
           animatedClose();
+          if (href && href.charAt(0) === '#') {
+            try { history.replaceState(null, '', href); } catch (_) {}
+            var target = null;
+            try { target = document.querySelector(href); } catch (_) { target = null; }
+            if (target) {
+              setTimeout(function () {
+                try {
+                  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  // Best-effort: sync top nav indicator to this hash
+                  var navWrap = document.querySelector('.nav-links');
+                  var navLinksArr = Array.prototype.slice.call(document.querySelectorAll('.nav-links .nav-link'));
+                  var indicatorEl = document.querySelector('.nav-indicator');
+                  var match = navLinksArr.find(function (a) { return (a.getAttribute('href') || '') === href; });
+                  if (match && navWrap && indicatorEl) {
+                    navLinksArr.forEach(function (a) { a.classList.toggle('active', a === match); });
+                    var rect = match.getBoundingClientRect();
+                    var parent = navWrap.getBoundingClientRect();
+                    var x = rect.left - parent.left;
+                    var w = rect.width;
+                    navWrap.style.setProperty('--indicator-x', x + 'px');
+                    navWrap.style.setProperty('--indicator-w', w + 'px');
+                  }
+                } catch (_) {}
+              }, 60); // short tick post-close, no flash
+            }
+          } else if (href) {
+            // External link: navigate after close; honor target
+            setTimeout(function () {
+              try {
+                if (tgt === '_blank') {
+                  window.open(href, '_blank', 'noopener');
+                } else {
+                  window.location.href = href;
+                }
+              } catch (_) {}
+            }, 10);
+          }
         },
         { capture: true }
       );

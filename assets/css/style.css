@@ -301,11 +301,68 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0;
   transform: translateY(-8px);
   transition: opacity 150ms ease, transform 150ms ease;
+  visibility: hidden; /* prevent any flash when not open */
 }
 .mobile-menu.open { 
   pointer-events: auto; 
   opacity: 1; 
   transform: translateY(0); 
+  visibility: visible;
+}
+/* Ensure no flash under header while closing */
+.mobile-menu.closing {
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transform: translateY(-8px) !important;
+  visibility: hidden !important;
+}
+
+/* Mobile: Follow us block inside mobile drawer */
+@media (max-width: 767.98px) {
+  #mobile-menu .mobile-follow {
+    margin-top: 15rem;
+    padding: 1.5rem;
+    border-top: 1px solid var(--nav-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    background: var(--nav-bg);
+  }
+  #mobile-menu .mobile-follow__title {
+    font-size: 2rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--nav-fg);
+    opacity: .85;
+  }
+  #mobile-menu .mobile-follow__icons {
+    display: flex;
+    gap: 2rem; /* more space between icons */
+  }
+
+  #mobile-menu .mobile-follow__icons a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 68px !important;   /* XL touch target */
+    height: 68px !important;  /* XL touch target */
+    border-radius: 9999px !important; /* ensure circular */
+    color: var(--primary);
+    background: #dfdfe0 !important;     /* light gray background */
+    border: 0;               /* no border */
+    text-decoration: none;
+    box-shadow: none;        /* no shadow */
+    transition: color 150ms ease, transform 150ms ease, background-color 150ms ease;
+  }
+  #mobile-menu .mobile-follow__icons a:hover,
+  #mobile-menu .mobile-follow__icons a:focus-visible {
+    color: var(--secondary);
+    background: #ffffff !important;     /* slightly darker gray on hover */
+    transform: translateY(-1px);
+    box-shadow: none;
+  }
+  #mobile-menu .mobile-follow__icons i { font-size: 28px; line-height: 1; }
 }
 .mobile-menu__backdrop { 
   display: none; 
@@ -339,6 +396,10 @@ h1, h2, h3, h4, h5, h6 {
 .section { 
   padding: 5rem 0;
   margin: 6rem 0 6rem 0; 
+}
+/* Ensure anchored sections account for fixed header height */
+.scroll-offset {
+  scroll-margin-top: var(--nav-h);
 }
 .section-title { 
   font-size: 2.5rem; 
