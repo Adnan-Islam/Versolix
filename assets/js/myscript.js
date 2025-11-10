@@ -418,3 +418,239 @@ document.addEventListener('DOMContentLoaded', () => {
   initSlider('pricing');
   initSlider('why');
 });
+// Mobile nav: close handler for full-screen overlay + auto-injected close button
+(function () {
+  function injectNavCloseButtons() {
+    var containers = document.querySelectorAll('.nav-menu, .mobile-menu, .navbar-nav');
+    containers.forEach(function (menu) {
+      if (!menu.querySelector('.nav-close')) {
+        var btn = document.createElement('button');
+        btn.className = 'nav-close';
+        btn.setAttribute('aria-label', 'Close menu');
+        btn.type = 'button';
+        btn.textContent = '\u00D7'; // ×
+        menu.appendChild(btn);
+      }
+    });
+  }
+  function closeMobileNav() {
+    var body = document.body;
+    var header = document.querySelector('header');
+    // Remove open flags on common containers
+    var menus = document.querySelectorAll(
+      '.nav-menu, .navbar-nav, .mobile-menu'
+    );
+    menus.forEach(function (el) {
+      el.classList.remove('open');
+      el.classList.remove('active');
+      // If a toggler controls it via aria-expanded, reset it
+      var togglerId = el.getAttribute('aria-labelledby');
+      if (togglerId) {
+        var tg = document.getElementById(togglerId);
+        if (tg) tg.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Clear body/header/nav open flags
+    body.classList.remove('menu-open');
+    body.classList.remove('nav-open');
+    if (header) header.classList.remove('nav-open');
+    var nav = document.querySelector('nav');
+    if (nav) nav.classList.remove('open');
+  }
+
+  function bindNavCloseHandlers() {
+    // Close button (×)
+    document
+      .querySelectorAll('.nav-menu .nav-close, .mobile-menu .nav-close, .navbar-nav .nav-close')
+      .forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeMobileNav();
+        });
+      });
+
+    // Close when clicking a link inside the mobile overlay
+    document
+      .querySelectorAll('.nav-menu a, .mobile-menu a, .navbar-nav a')
+      .forEach(function (a) {
+        a.addEventListener('click', function () {
+          closeMobileNav();
+        });
+      });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeMobileNav();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      injectNavCloseButtons();
+      bindNavCloseHandlers();
+    });
+  } else {
+    injectNavCloseButtons();
+    bindNavCloseHandlers();
+  }
+})();
+
+// Backdrop disabled: ensure any injected .nav-backdrop is removed to keep white background only
+(function () {
+  function removeBackdrops() {
+    document.querySelectorAll('.nav-backdrop').forEach(function (el) {
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', removeBackdrops);
+  } else {
+    removeBackdrops();
+  }
+})();
+// Enhanced mobile nav: backdrop + slide/fade close animation (non-invasive)
+(function () {
+  function ensureBackdrop() {
+    var backdrop = document.querySelector('.nav-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.className = 'nav-backdrop';
+      document.body.appendChild(backdrop);
+    }
+    backdrop.addEventListener('click', function (e) {
+      e.preventDefault();
+      animatedClose();
+    });
+  }
+
+  function animatedClose() {
+    var body = document.body;
+    var header = document.querySelector('header');
+    var nav = document.querySelector('nav');
+    var menus = document.querySelectorAll('.nav-menu, .mobile-menu, .navbar-nav');
+    var hasAnyOpen = false;
+    menus.forEach(function (el) {
+      if (el.classList.contains('open') || el.classList.contains('active')) {
+        hasAnyOpen = true;
+        el.classList.add('closing');
+      }
+    });
+    // If nothing is open, nothing to do
+    if (!hasAnyOpen && !body.classList.contains('menu-open') && !body.classList.contains('nav-open')) return;
+
+    setTimeout(function () {
+      menus.forEach(function (el) {
+        el.classList.remove('closing');
+        el.classList.remove('open');
+        el.classList.remove('active');
+        var togglerId = el.getAttribute('aria-labelledby');
+        if (togglerId) {
+          var tg = document.getElementById(togglerId);
+          if (tg) tg.setAttribute('aria-expanded', 'false');
+        }
+      });
+      body.classList.remove('menu-open');
+      body.classList.remove('nav-open');
+      if (header) header.classList.remove('nav-open');
+      if (nav) nav.classList.remove('open');
+    }, 200); // match CSS navSlideOut duration
+  }
+
+  function bindEnhancedHandlers() {
+    // Intercept close button/link clicks in capture phase to run animated close
+    var selectors = [
+      '.nav-menu .nav-close',
+      '.mobile-menu .nav-close',
+      '.navbar-nav .nav-close',
+      '.nav-menu a',
+      '.mobile-menu a',
+      '.navbar-nav a',
+    ].join(',');
+    document.querySelectorAll(selectors).forEach(function (el) {
+      el.addEventListener(
+        'click',
+        function (e) {
+          e.preventDefault();
+          if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+          animatedClose();
+        },
+        { capture: true }
+      );
+    });
+
+    // Close on Escape (capture)
+    document.addEventListener(
+      'keydown',
+      function (e) {
+        if (e.key === 'Escape') {
+          if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+          animatedClose();
+        }
+      },
+      { capture: true }
+    );
+  }
+
+  function syncBodyOpenState() {
+    var body = document.body;
+    var isOpen = body.classList.contains('menu-open') || body.classList.contains('nav-open');
+    if (!isOpen) {
+      var header = document.querySelector('header');
+      var nav = document.querySelector('nav');
+      if ((header && header.classList.contains('nav-open')) || (nav && nav.classList.contains('open'))) {
+        isOpen = true;
+      }
+    }
+    if (!isOpen) {
+      document.querySelectorAll('.nav-menu, .mobile-menu, .navbar-nav').forEach(function (el) {
+        if (el.classList.contains('open') || el.classList.contains('active')) isOpen = true;
+      });
+    }
+    body.classList.toggle('menu-open', isOpen);
+  }
+
+  function observeOpenState() {
+    var observer = new MutationObserver(syncBodyOpenState);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+    syncBodyOpenState();
+  }
+
+  function init() {
+    ensureBackdrop();
+    bindEnhancedHandlers();
+    observeOpenState();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+// Ensure nav merges cleanly between mobile and larger screens
+;(function () {
+  function resetNavForDesktop() {
+    if (window.innerWidth < 768) return;
+    var body = document.body;
+    var header = document.querySelector('header');
+    var nav = document.querySelector('nav');
+    document.querySelectorAll('.nav-menu, .mobile-menu, .navbar-nav').forEach(function (el) {
+      el.classList.remove('open', 'active', 'closing');
+    });
+    body.classList.remove('menu-open', 'nav-open');
+    if (header) header.classList.remove('nav-open');
+    if (nav) nav.classList.remove('open');
+  }
+
+  function onResize() {
+    resetNavForDesktop();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', resetNavForDesktop);
+  } else {
+    resetNavForDesktop();
+  }
+  window.addEventListener('resize', onResize);
+})();

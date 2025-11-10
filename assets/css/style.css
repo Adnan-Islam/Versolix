@@ -601,8 +601,8 @@ h1, h2, h3, h4, h5, h6 {
 /* Keep section background white, and scope variables for card theme */
 .pricing {
     background: #fff;
-  --pricing-card-bg: #eff6ff;          /* blue-50 */
-  --pricing-card-border: #dbeafe;      /* blue-100 */
+  --pricing-card-bg: linear-gradient(145deg, #fddbd3, #fab7a8, #fddbd3);       
+  --pricing-card-border: #fedfdb;      /* blue-100 */
   --pricing-card-hover-bg: #ffffff;    /* white */
   --pricing-card-hover-border: #93c5fd;/* blue-300 */
 }
@@ -612,7 +612,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .pricing-aside { grid-area: aside; }
 
-.pricing-aside .section-title { color: #2563eb; text-align: left; }
+.pricing-aside .section-title { color: tomato; text-align: left; }
 .pricing-aside .section-subtitle { color: #334155; text-align: left; max-width: 36rem; }
 
 .pricing-cards { grid-area: cards; display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
@@ -622,10 +622,6 @@ h1, h2, h3, h4, h5, h6 {
 .pricing .pricing-card {
   background: var(--pricing-card-bg);
   border-color: var(--pricing-card-border);
-}
-.pricing .pricing-card:hover {
-  background: var(--pricing-card-hover-bg);
-  border-color: var(--pricing-card-hover-border);
 }
 
 /* Contact */
@@ -1076,4 +1072,697 @@ h1, h2, h3, h4, h5, h6 {
 .modal-body h4 { margin: 1rem 0 .25rem; font-size: 1.125rem; font-weight: 700; color: #111827; }
 .modal-body p { margin: 0 0 .75rem; color: #111827; }
 .modal-body ul { margin: 0 0 .75rem 1rem; color: #111827; }
+/* === Mobile Nav Override: Force Full-Screen Overlay === */
+@media (max-width: 575.98px) {
+  .nav-menu.open,
+  .nav-menu.active,
+  .navbar-nav.open,
+  .navbar-nav.active,
+  .mobile-menu.open,
+  .mobile-menu.active,
+  nav.open .nav-menu,
+  nav.active .nav-menu,
+  header.nav-open .nav-menu,
+  .header.nav-open .nav-menu,
+  body.menu-open .nav-menu,
+  body.nav-open .nav-menu {
+    position: fixed !important;
+    inset: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 20px !important;
+    padding: 56px 20px 24px !important;
+    overflow-y: auto !important;
+  }
+}
+/* === Mobile Nav: Right-align items (full-screen) === */
+@media (max-width: 575.98px) {
+  .nav-menu.open,
+  .nav-menu.active,
+  .navbar-nav.open,
+  .navbar-nav.active,
+  .mobile-menu.open,
+  .mobile-menu.active,
+  nav.open .nav-menu,
+  nav.active .nav-menu,
+  header.nav-open .nav-menu,
+  .header.nav-open .nav-menu,
+  body.menu-open .nav-menu,
+  body.nav-open .nav-menu {
+    align-items: flex-end !important;   /* right side for column layout */
+    justify-content: flex-start !important; /* start from top */
+    padding: 56px 20px 24px !important;    /* keep top-right padding */
+  }
 
+  /* Make links align to the right edge */
+  .nav-menu.open a,
+  .nav-menu.active a,
+  .navbar-nav.open a,
+  .navbar-nav.active a,
+  .mobile-menu.open a,
+  .mobile-menu.active a,
+  nav.open .nav-menu a,
+  nav.active .nav-menu a,
+  header.nav-open .nav-menu a,
+  .header.nav-open .nav-menu a,
+  body.menu-open .nav-menu a,
+  body.nav-open .nav-menu a {
+    text-align: right !important;
+    width: 100%;
+  }
+}
+/* === Mobile Nav: Pin close (×) to top-right === */
+@media (max-width: 575.98px) {
+  .nav-menu .nav-close,
+  .mobile-menu .nav-close,
+  .navbar-nav .nav-close {
+    position: fixed !important;
+    top: 12px !important;
+    right: 12px !important;
+    z-index: 10000 !important; /* above overlay */
+    pointer-events: auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    background: #f5f5f5 !important;
+    color: #111 !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15) !important;
+    transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease, opacity 180ms ease !important;
+    backdrop-filter: saturate(140%) blur(2px);
+  }
+
+  /* Subtle entrance animation when menu opens */
+  .nav-menu.open .nav-close,
+  .nav-menu.active .nav-close,
+  .mobile-menu.open .nav-close,
+  .mobile-menu.active .nav-close,
+  .navbar-nav.open .nav-close,
+  .navbar-nav.active .nav-close,
+  nav.open .nav-menu .nav-close,
+  nav.active .nav-menu .nav-close,
+  header.nav-open .nav-menu .nav-close,
+  .header.nav-open .nav-menu .nav-close,
+  body.menu-open .nav-menu .nav-close,
+  body.nav-open .nav-menu .nav-close {
+    animation: navClosePopIn 240ms cubic-bezier(.2,.8,.2,1) both;
+  }
+
+  .nav-menu.open .nav-close,
+  .nav-menu.active .nav-close,
+  .mobile-menu.open .nav-close,
+  .mobile-menu.active .nav-close,
+  .navbar-nav.open .nav-close,
+  .navbar-nav.active .nav-close,
+  nav.open .nav-menu .nav-close,
+  nav.active .nav-menu .nav-close,
+  header.nav-open .nav-menu .nav-close,
+  .header.nav-open .nav-menu .nav-close,
+  body.menu-open .nav-menu .nav-close,
+  body.nav-open .nav-menu .nav-close {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Hover/active effects for a stylish feel */
+  .nav-menu .nav-close:hover,
+  .mobile-menu .nav-close:hover,
+  .navbar-nav .nav-close:hover {
+    transform: scale(1.07) rotate(90deg);
+    background: #ffffff !important;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18) !important;
+  }
+
+  .nav-menu .nav-close:active,
+  .mobile-menu .nav-close:active,
+  .navbar-nav .nav-close:active {
+    transform: scale(0.97) rotate(90deg);
+  }
+
+  /* Focus ring for accessibility */
+  .nav-menu .nav-close:focus-visible,
+  .mobile-menu .nav-close:focus-visible,
+  .navbar-nav .nav-close:focus-visible {
+    outline: 2px solid #111 !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Optional subtle ripple/highlight */
+  .nav-menu .nav-close::after,
+  .mobile-menu .nav-close::after,
+  .navbar-nav .nav-close::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: radial-gradient(closest-side, rgba(0,0,0,0.06), transparent 70%);
+    transform: scale(0.8);
+    opacity: 0;
+    transition: transform 220ms ease, opacity 220ms ease;
+  }
+
+  .nav-menu .nav-close:hover::after,
+  .mobile-menu .nav-close:hover::after,
+  .navbar-nav .nav-close:hover::after {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  @keyframes navClosePopIn {
+    from { opacity: 0; transform: translateY(-10px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .nav-menu .nav-close,
+    .mobile-menu .nav-close,
+    .navbar-nav .nav-close { transition: none !important; }
+    .nav-menu .nav-close:hover,
+    .mobile-menu .nav-close:hover,
+    .navbar-nav .nav-close:hover { transform: none !important; }
+    .nav-menu.open .nav-close,
+    .nav-menu.active .nav-close,
+    .mobile-menu.open .nav-close,
+    .mobile-menu.active .nav-close,
+    .navbar-nav.open .nav-close,
+    .navbar-nav.active .nav-close { animation: none !important; }
+  }
+}
+/* === Mobile Nav: Remove text underline on links === */
+@media (max-width: 575.98px) {
+  .nav-menu.open a,
+  .nav-menu.active a,
+  .navbar-nav.open a,
+  .navbar-nav.active a,
+  .mobile-menu.open a,
+  .mobile-menu.active a,
+  nav.open .nav-menu a,
+  nav.active .nav-menu a,
+  header.nav-open .nav-menu a,
+  .header.nav-open .nav-menu a,
+  body.menu-open .nav-menu a,
+  body.nav-open .nav-menu a,
+  .nav-menu.open a:hover,
+  .nav-menu.active a:hover,
+  .navbar-nav.open a:hover,
+  .navbar-nav.active a:hover,
+  .mobile-menu.open a:hover,
+  .mobile-menu.active a:hover,
+  nav.open .nav-menu a:hover,
+  nav.active .nav-menu a:hover,
+  header.nav-open .nav-menu a:hover,
+  .header.nav-open .nav-menu a:hover,
+  body.menu-open .nav-menu a:hover,
+  body.nav-open .nav-menu a:hover,
+  .nav-menu.open a:focus,
+  .nav-menu.active a:focus,
+  .navbar-nav.open a:focus,
+  .navbar-nav.active a:focus,
+  .mobile-menu.open a:focus,
+  .mobile-menu.active a:focus,
+  nav.open .nav-menu a:focus,
+  nav.active .nav-menu a:focus,
+  header.nav-open .nav-menu a:focus,
+  .header.nav-open .nav-menu a:focus,
+  body.menu-open .nav-menu a:focus,
+  body.nav-open .nav-menu a:focus,
+  .nav-menu.open a:active,
+  .nav-menu.active a:active,
+  .navbar-nav.open a:active,
+  .navbar-nav.active a:active,
+  .mobile-menu.open a:active,
+  .mobile-menu.active a:active,
+  nav.open .nav-menu a:active,
+  nav.active .nav-menu a:active,
+  header.nav-open .nav-menu a:active,
+  .header.nav-open .nav-menu a:active,
+  body.menu-open .nav-menu a:active,
+  body.nav-open .nav-menu a:active {
+    text-decoration: none !important;
+  }
+}
+/* === Mobile Nav: Larger black link text === */
+@media (max-width: 575.98px) {
+  .nav-menu.open a,
+  .nav-menu.active a,
+  .navbar-nav.open a,
+  .navbar-nav.active a,
+  .mobile-menu.open a,
+  .mobile-menu.active a,
+  nav.open .nav-menu a,
+  nav.active .nav-menu a,
+  header.nav-open .nav-menu a,
+  .header.nav-open .nav-menu a,
+  body.menu-open .nav-menu a,
+  body.nav-open .nav-menu a {
+    color: #000 !important;
+    font-size: clamp(22px, 6vw, 30px) !important;
+    line-height: 1.35 !important;
+    font-weight: 600 !important;
+  }
+
+  /* Keep black color on hover/focus/active as well */
+  .nav-menu.open a:hover,
+  .nav-menu.active a:hover,
+  .navbar-nav.open a:hover,
+  .navbar-nav.active a:hover,
+  .mobile-menu.open a:hover,
+  .mobile-menu.active a:hover,
+  nav.open .nav-menu a:hover,
+  nav.active .nav-menu a:hover,
+  header.nav-open .nav-menu a:hover,
+  .header.nav-open .nav-menu a:hover,
+  body.menu-open .nav-menu a:hover,
+  body.nav-open .nav-menu a:hover,
+  .nav-menu.open a:focus,
+  .nav-menu.active a:focus,
+  .navbar-nav.open a:focus,
+  .navbar-nav.active a:focus,
+  .mobile-menu.open a:focus,
+  .mobile-menu.active a:focus,
+  nav.open .nav-menu a:focus,
+  nav.active .nav-menu a:focus,
+  header.nav-open .nav-menu a:focus,
+  .header.nav-open .nav-menu a:focus,
+  body.menu-open .nav-menu a:focus,
+  body.nav-open .nav-menu a:focus,
+  .nav-menu.open a:active,
+  .nav-menu.active a:active,
+  .navbar-nav.open a:active,
+  .navbar-nav.active a:active,
+  .mobile-menu.open a:active,
+  .mobile-menu.active a:active,
+  nav.open .nav-menu a:active,
+  nav.active .nav-menu a:active,
+  header.nav-open .nav-menu a:active,
+  .header.nav-open .nav-menu a:active,
+  body.menu-open .nav-menu a:active,
+  body.nav-open .nav-menu a:active {
+    color: #000 !important;
+    background-color: white;
+  }
+}
+/* === Mobile Nav: Larger, bolder close (×) === */
+@media (max-width: 575.98px) {
+  .nav-menu .nav-close,
+  .mobile-menu .nav-close,
+  .navbar-nav .nav-close {
+    font-size: 30px !important; /* larger × */
+    font-weight: 800 !important; /* bold × */
+    line-height: 1 !important;
+  }
+}
+/* === Mobile Nav: Extra spacing below close (×) === */
+@media (max-width: 575.98px) {
+  .nav-menu .nav-close,
+  .mobile-menu .nav-close,
+  .navbar-nav .nav-close {
+    top: 20px !important;           /* nudge down for more space */
+    margin-bottom: 5px !important; /* additional visual spacing */
+  }
+}
+/* === Mobile Nav: More spacing around close (×) === */
+@media (max-width: 575.98px) {
+  .nav-menu .nav-close,
+  .mobile-menu .nav-close,
+  .navbar-nav .nav-close {
+    top: 28px !important;
+    right: 20px !important;
+    margin: 12px !important;
+  }
+}
+/* === Mobile Nav: Separate close button and menu links (no overlap) === */
+@media (max-width: 575.98px) {
+  /* Add safe top padding equal to close button area */
+  .nav-menu.open,
+  .nav-menu.active,
+  .navbar-nav.open,
+  .navbar-nav.active,
+  .mobile-menu.open,
+  .mobile-menu.active,
+  nav.open .nav-menu,
+  nav.active .nav-menu,
+  header.nav-open .nav-menu,
+  .header.nav-open .nav-menu,
+  body.menu-open .nav-menu,
+  body.nav-open .nav-menu {
+    box-sizing: border-box !important;
+    padding-top: 96px !important; /* close btn top (≈28px) + size (≈44px) + extra spacing */
+    gap: 20px !important; /* consistent vertical rhythm between items */
+  }
+
+  /* Ensure first link doesn’t sit too close to the top */
+  .nav-menu.open a:first-of-type,
+  .nav-menu.active a:first-of-type,
+  .navbar-nav.open a:first-of-type,
+  .navbar-nav.active a:first-of-type,
+  .mobile-menu.open a:first-of-type,
+  .mobile-menu.active a:first-of-type,
+  nav.open .nav-menu a:first-of-type,
+  nav.active .nav-menu a:first-of-type,
+  header.nav-open .nav-menu a:first-of-type,
+  .header.nav-open .nav-menu a:first-of-type,
+  body.menu-open .nav-menu a:first-of-type,
+  body.nav-open .nav-menu a:first-of-type {
+    margin-top: 8px !important;
+  }
+
+  /* Add a little spacing between each link for readability */
+  .nav-menu.open a,
+  .nav-menu.active a,
+  .navbar-nav.open a,
+  .navbar-nav.active a,
+  .mobile-menu.open a,
+  .mobile-menu.active a,
+  nav.open .nav-menu a,
+  nav.active .nav-menu a,
+  header.nav-open .nav-menu a,
+  .header.nav-open .nav-menu a,
+  body.menu-open .nav-menu a,
+  body.nav-open .nav-menu a {
+    margin: 6px 0 !important;
+  }
+}
+/* === Mobile Nav: Always white background, black text on link click === */
+@media (max-width: 575.98px) {
+  /* Base link style inside open mobile menu */
+  .nav-menu.open a,
+  .nav-menu.active a,
+  .navbar-nav.open a,
+  .navbar-nav.active a,
+  .mobile-menu.open a,
+  .mobile-menu.active a,
+  nav.open .nav-menu a,
+  nav.active .nav-menu a,
+  header.nav-open .nav-menu a,
+  .header.nav-open .nav-menu a,
+  body.menu-open .nav-menu a,
+  body.nav-open .nav-menu a {
+    background: transparent !important;     /* let overlay white show through */
+    background-color: transparent !important;
+    color: #000 !important;                 /* always black text */
+  }
+
+  /* Interactive states: keep background clear and text black */
+  .nav-menu.open a:hover,
+  .nav-menu.open a:focus,
+  .nav-menu.open a:active,
+  .nav-menu.active a:hover,
+  .nav-menu.active a:focus,
+  .nav-menu.active a:active,
+  .navbar-nav.open a:hover,
+  .navbar-nav.open a:focus,
+  .navbar-nav.open a:active,
+  .navbar-nav.active a:hover,
+  .navbar-nav.active a:focus,
+  .navbar-nav.active a:active,
+  .mobile-menu.open a:hover,
+  .mobile-menu.open a:focus,
+  .mobile-menu.open a:active,
+  .mobile-menu.active a:hover,
+  .mobile-menu.active a:focus,
+  .mobile-menu.active a:active,
+  nav.open .nav-menu a:hover,
+  nav.open .nav-menu a:focus,
+  nav.open .nav-menu a:active,
+  nav.active .nav-menu a:hover,
+  nav.active .nav-menu a:focus,
+  nav.active .nav-menu a:active,
+  header.nav-open .nav-menu a:hover,
+  header.nav-open .nav-menu a:focus,
+  header.nav-open .nav-menu a:active,
+  .header.nav-open .nav-menu a:hover,
+  .header.nav-open .nav-menu a:focus,
+  .header.nav-open .nav-menu a:active,
+  body.menu-open .nav-menu a:hover,
+  body.menu-open .nav-menu a:focus,
+  body.menu-open .nav-menu a:active,
+  body.nav-open .nav-menu a:hover,
+  body.nav-open .nav-menu a:focus,
+  body.nav-open .nav-menu a:active,
+  /* common active class variants */
+  .nav-menu.open a.active,
+  .nav-menu.active a.active,
+  .navbar-nav.open a.active,
+  .navbar-nav.active a.active,
+  .mobile-menu.open a.active,
+  .mobile-menu.active a.active,
+  .nav-menu.open li.active > a,
+  .nav-menu.active li.active > a,
+  .navbar-nav.open li.active > a,
+  .navbar-nav.active li.active > a,
+  .mobile-menu.open li.active > a,
+  .mobile-menu.active li.active > a {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+}
+/* === Responsive Nav: Normalize for tablet/desktop and prevent mobile overlay bleed === */
+@media (min-width: 576px) {
+  .nav-menu.open,
+  .nav-menu.active,
+  .navbar-nav.open,
+  .navbar-nav.active,
+  .mobile-menu.open,
+  .mobile-menu.active,
+  nav.open .nav-menu,
+  nav.active .nav-menu,
+  header.nav-open .nav-menu,
+  .header.nav-open .nav-menu,
+  body.menu-open .nav-menu,
+  body.nav-open .nav-menu {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    z-index: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 16px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .nav-menu.open a,
+  .nav-menu.active a,
+  .navbar-nav.open a,
+  .navbar-nav.active a,
+  .mobile-menu.open a,
+  .mobile-menu.active a,
+  nav.open .nav-menu a,
+  nav.active .nav-menu a,
+  header.nav-open .nav-menu a,
+  .header.nav-open .nav-menu a,
+  body.menu-open .nav-menu a,
+  body.nav-open .nav-menu a {
+    font-size: inherit !important;
+    line-height: inherit !important;
+    font-weight: inherit !important;
+    text-align: left !important;
+    width: auto !important;
+    margin: 0 !important;
+    color: inherit !important;
+    background: transparent !important;
+  }
+
+  /* Hide mobile-only close button on larger screens */
+  .nav-menu .nav-close,
+  .mobile-menu .nav-close,
+  .navbar-nav .nav-close {
+    display: none !important;
+  }
+}
+/* === Tablet Support: Treat up to 768px as mobile overlay === */
+@media (max-width: 767.98px) {
+  /* Force full-screen overlay for open menus (wins over earlier desktop reset) */
+  .nav-menu.open,
+  .nav-menu.active,
+  .navbar-nav.open,
+  .navbar-nav.active,
+  .mobile-menu.open,
+  .mobile-menu.active,
+  nav.open .nav-menu,
+  nav.active .nav-menu,
+  header.nav-open .nav-menu,
+  .header.nav-open .nav-menu,
+  body.menu-open .nav-menu,
+  body.nav-open .nav-menu {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #ffffff !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;   /* right-align items */
+    justify-content: flex-start !important;
+    padding: 96px 20px 24px !important; /* leave space for close (×) */
+    gap: 20px !important;
+    overflow-y: auto !important;
+    box-shadow: none !important;
+  }
+
+  /* Show and pin the close (×) button */
+  .nav-menu .nav-close,
+  .mobile-menu .nav-close,
+  .navbar-nav .nav-close {
+    position: fixed !important;
+    top: 28px !important;
+    right: 20px !important;
+    display: inline-flex !important;
+    z-index: 10000 !important;
+  }
+
+  /* Link typography and alignment (always black text on white background) */
+  .nav-menu.open a,
+  .nav-menu.active a,
+  .navbar-nav.open a,
+  .navbar-nav.active a,
+  .mobile-menu.open a,
+  .mobile-menu.active a,
+  nav.open .nav-menu a,
+  nav.active .nav-menu a,
+  header.nav-open .nav-menu a,
+  .header.nav-open .nav-menu a,
+  body.menu-open .nav-menu a,
+  body.nav-open .nav-menu a {
+    color: #000 !important;
+    background: transparent !important;
+    text-decoration: none !important;
+    text-align: right !important;
+    width: 100% !important;
+    font-size: clamp(20px, 5.5vw, 28px) !important;
+    line-height: 1.35 !important;
+    font-weight: 600 !important;
+    margin: 6px 0 !important;
+  }
+
+  /* Keep interactive states clean */
+  .nav-menu.open a:hover,
+  .nav-menu.open a:focus,
+  .nav-menu.open a:active,
+  .nav-menu.active a:hover,
+  .nav-menu.active a:focus,
+  .nav-menu.active a:active,
+  .navbar-nav.open a:hover,
+  .navbar-nav.open a:focus,
+  .navbar-nav.open a:active,
+  .navbar-nav.active a:hover,
+  .navbar-nav.active a:focus,
+  .navbar-nav.active a:active,
+  .mobile-menu.open a:hover,
+  .mobile-menu.open a:focus,
+  .mobile-menu.open a:active,
+  .mobile-menu.active a:hover,
+  .mobile-menu.active a:focus,
+  .mobile-menu.active a:active {
+    color: #000 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+/* === Tablet Nav (<=768px): Close (×) same as mobile === */
+@media (max-width: 767.98px) {
+  .nav-menu .nav-close,
+  .mobile-menu .nav-close,
+  .navbar-nav .nav-close {
+    position: fixed !important;
+    top: 28px !important;
+    right: 20px !important;
+    z-index: 10000 !important;
+    pointer-events: auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    background: #f5f5f5 !important;
+    color: #111 !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15) !important;
+    transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease, opacity 180ms ease !important;
+    backdrop-filter: saturate(140%) blur(2px);
+    font-size: 30px !important; /* larger × */
+    font-weight: 800 !important; /* bold × */
+    line-height: 1 !important;
+  }
+
+  .nav-menu.open .nav-close,
+  .nav-menu.active .nav-close,
+  .mobile-menu.open .nav-close,
+  .mobile-menu.active .nav-close,
+  .navbar-nav.open .nav-close,
+  .navbar-nav.active .nav-close,
+  nav.open .nav-menu .nav-close,
+  nav.active .nav-menu .nav-close,
+  header.nav-open .nav-menu .nav-close,
+  .header.nav-open .nav-menu .nav-close,
+  body.menu-open .nav-menu .nav-close,
+  body.nav-open .nav-menu .nav-close {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    animation: navClosePopIn 240ms cubic-bezier(.2,.8,.2,1) both;
+  }
+
+  .nav-menu .nav-close:hover,
+  .mobile-menu .nav-close:hover,
+  .navbar-nav .nav-close:hover { 
+    transform: scale(1.07) rotate(90deg);
+    background: #ffffff !important;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18) !important; 
+  }
+
+  .nav-menu .nav-close:active,
+  .mobile-menu .nav-close:active,
+  .navbar-nav .nav-close:active { 
+    transform: scale(0.97) rotate(90deg);
+  }
+
+  .nav-menu .nav-close:focus-visible,
+  .mobile-menu .nav-close:focus-visible,
+  .navbar-nav .nav-close:focus-visible {
+    outline: 2px solid #111 !important;
+    outline-offset: 2px !important;
+  }
+
+  @keyframes navClosePopIn {
+    from { opacity: 0; transform: translateY(-10px) scale(0.9); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-menu .nav-close,
+    .mobile-menu .nav-close,
+    .navbar-nav .nav-close { transition: none !important; }
+    .nav-menu .nav-close:hover,
+    .mobile-menu .nav-close:hover,
+    .navbar-nav .nav-close:hover { transform: none !important; }
+    .nav-menu.open .nav-close,
+    .nav-menu.active .nav-close,
+    .mobile-menu.open .nav-close,
+    .mobile-menu.active .nav-close,
+    .navbar-nav.open .nav-close,
+    .navbar-nav.active .nav-close { animation: none !important; }
+  }
+}
