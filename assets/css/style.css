@@ -30,6 +30,97 @@
   --nav-overlay: rgba(2, 6, 23, 0.25); /* cool, slate-tinted overlay */
 }
 
+/* Final: remove all interactive effects on mobile menu links */
+@media (max-width: 767.98px) {
+  #mobile-menu.open,
+  #mobile-menu.active {
+    align-items: center !important;
+    background: var(--nav-bg) !important;
+  }
+
+  #mobile-menu.open > a,
+  #mobile-menu.active > a {
+    color: var(--primary) !important;
+    background: transparent !important;
+    text-decoration: none !important;
+    transition: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    width: auto !important;
+    text-align: center !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #mobile-menu.open > a:hover,
+  #mobile-menu.open > a:focus,
+  #mobile-menu.open > a:active,
+  #mobile-menu.active > a:hover,
+  #mobile-menu.active > a:focus,
+  #mobile-menu.active > a:active {
+    color: var(--primary) !important;
+    background: transparent !important;
+    text-decoration: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}
+
+/* Final mobile menu overrides: center links with primary color on nav background */
+@media (max-width: 767.98px) {
+  /* Center the stack and use nav background */
+  .mobile-menu.open,
+  .mobile-menu.active {
+    align-items: center !important;
+    background: var(--nav-bg) !important;
+  }
+
+  /* Make each link size to content and center text */
+  .mobile-menu.open a,
+  .mobile-menu.active a {
+    width: auto !important;
+    text-align: center !important;
+    color: var(--primary) !important;
+  }
+
+  /* Keep states consistent */
+  .mobile-menu.open a:hover,
+  .mobile-menu.open a:focus,
+  .mobile-menu.open a:active,
+  .mobile-menu.active a:hover,
+  .mobile-menu.active a:focus,
+  .mobile-menu.active a:active {
+    color: var(--primary) !important;
+  }
+}
+
+/* Strong specificity overrides for mobile menu (uses #mobile-menu) */
+@media (max-width: 767.98px) {
+  #mobile-menu.open,
+  #mobile-menu.active {
+    align-items: center !important;
+    background: var(--nav-bg) !important;
+  }
+
+  #mobile-menu.open > a,
+  #mobile-menu.active > a {
+    width: auto !important;
+    text-align: center !important;
+    color: var(--primary) !important;
+    background: transparent !important;
+  }
+
+  #mobile-menu.open > a:hover,
+  #mobile-menu.open > a:focus,
+  #mobile-menu.open > a:active,
+  #mobile-menu.active > a:hover,
+  #mobile-menu.active > a:focus,
+  #mobile-menu.active > a:active {
+    color: var(--primary) !important;
+  }
+}
+
 /* Base reset and media */
 * { 
   box-sizing: 
@@ -809,6 +900,35 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 2.25rem; 
   }
 }
+
+/* Mobile nav: centered primary links on nav background */
+@media (max-width: 767.98px) {
+  /* Ensure the mobile menu uses the nav background */
+  .mobile-menu.open,
+  .mobile-menu.active {
+    background: var(--nav-bg) !important;
+  }
+
+  /* Center each link, use primary text, and nav background */
+  .mobile-menu.open a,
+  .mobile-menu.active a {
+    text-align: center !important;
+    width: 100% !important;
+    color: var(--primary) !important;
+    background: var(--nav-bg) !important;
+  }
+
+  /* Keep interactive states consistent */
+  .mobile-menu.open a:hover,
+  .mobile-menu.open a:focus,
+  .mobile-menu.open a:active,
+  .mobile-menu.active a:hover,
+  .mobile-menu.active a:focus,
+  .mobile-menu.active a:active {
+    color: var(--primary) !important;
+    background: var(--nav-bg) !important;
+  }
+}
 .info-intro h3 { 
   font-size: 1.5rem; 
   font-weight: 700; 
@@ -1072,6 +1192,8 @@ h1, h2, h3, h4, h5, h6 {
 .modal-body h4 { margin: 1rem 0 .25rem; font-size: 1.125rem; font-weight: 700; color: #111827; }
 .modal-body p { margin: 0 0 .75rem; color: #111827; }
 .modal-body ul { margin: 0 0 .75rem 1rem; color: #111827; }
+
+
 /* === Mobile Nav Override: Force Full-Screen Overlay === */
 @media (max-width: 575.98px) {
   .nav-menu.open,
@@ -1138,7 +1260,7 @@ h1, h2, h3, h4, h5, h6 {
   .header.nav-open .nav-menu a,
   body.menu-open .nav-menu a,
   body.nav-open .nav-menu a {
-    text-align: right !important;
+    text-align: center !important;
     width: 100%;
   }
 }

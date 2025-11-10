@@ -27,18 +27,39 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape' && mobileMenu && mobileMenu.classList.contains('open')) setMobileState(false);
   });
 
-  // Smooth scrolling for in-page links (skip modal triggers and dummy # links)
+  // Smooth scrolling for in-page links
+  // Important: DO NOT scroll/navigate for links inside the mobile menu.
   document.querySelectorAll('a[href^="#"]:not([data-modal])').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
       const href = anchor.getAttribute('href') || '';
       if (href === '#' || href.trim() === '') return;
+
+      // If the link lives inside the mobile drawer, hard-close and stay put
+      const inMobileMenu = anchor.closest('#mobile-menu') || anchor.closest('.mobile-menu');
+      if (inMobileMenu) {
+        e.preventDefault();
+        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+        // Hard close: remove any open/active/closing flags and restore body state
+        try {
+          inMobileMenu.classList.remove('open', 'active', 'closing');
+        } catch (_) {}
+        if (mobileMenu) {
+          mobileMenu.classList.remove('open', 'active', 'closing');
+          mobileMenu.setAttribute('aria-hidden', 'true');
+        }
+        if (mobileMenuButton) mobileMenuButton.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('menu-open', 'nav-open');
+        document.body.style.overflow = '';
+        return; // Do not scroll
+      }
+
+      // For regular in-page links outside the mobile drawer, smooth scroll
       let target = null;
       try { target = document.querySelector(href); } catch (_) { target = null; }
       if (target) {
         e.preventDefault();
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         if (mobileMenu) setMobileState(false);
-        // If navigating to services, hint the reveal a moment after scroll starts
         if (href === '#services') {
           setTimeout(() => { target.classList.add('in-view'); }, 250);
         }
