@@ -320,7 +320,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Mobile: Follow us block inside mobile drawer */
 @media (max-width: 767.98px) {
   #mobile-menu .mobile-follow {
-    margin-top: 15rem;
+    margin-top: 12rem;
     padding: 1.5rem;
     border-top: 1px solid var(--nav-border);
     display: flex;
@@ -345,8 +345,8 @@ h1, h2, h3, h4, h5, h6 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 68px !important;   /* XL touch target */
-    height: 68px !important;  /* XL touch target */
+    width: 50px !important;   /* XL touch target */
+    height: 50px !important;  /* XL touch target */
     border-radius: 9999px !important; /* ensure circular */
     color: var(--primary);
     background: #dfdfe0 !important;     /* light gray background */
