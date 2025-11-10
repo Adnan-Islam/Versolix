@@ -320,7 +320,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Mobile: Follow us block inside mobile drawer */
 @media (max-width: 767.98px) {
   #mobile-menu .mobile-follow {
-    margin-top: 12rem;
+    margin-top: 10rem;
     padding: 1.5rem;
     border-top: 1px solid var(--nav-border);
     display: flex;
@@ -330,7 +330,7 @@ h1, h2, h3, h4, h5, h6 {
     background: var(--nav-bg);
   }
   #mobile-menu .mobile-follow__title {
-    font-size: 2rem;
+    font-size: 1.5rem;
     text-align: center;
     font-weight: 600;
     color: var(--nav-fg);
@@ -345,8 +345,8 @@ h1, h2, h3, h4, h5, h6 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 50px !important;   /* XL touch target */
-    height: 50px !important;  /* XL touch target */
+    width: 45px !important;   /* XL touch target */
+    height: 45px !important;  /* XL touch target */
     border-radius: 9999px !important; /* ensure circular */
     color: var(--primary);
     background: #dfdfe0 !important;     /* light gray background */
@@ -354,15 +354,20 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: none;
     box-shadow: none;        /* no shadow */
     transition: color 150ms ease, transform 150ms ease, background-color 150ms ease;
+    -webkit-tap-highlight-color: transparent; /* remove mobile tap highlight */
   }
   #mobile-menu .mobile-follow__icons a:hover,
-  #mobile-menu .mobile-follow__icons a:focus-visible {
+  #mobile-menu .mobile-follow__icons a:focus-visible,
+  #mobile-menu .mobile-follow__icons a:active {
     color: var(--secondary);
-    background: #ffffff !important;     /* slightly darker gray on hover */
-    transform: translateY(-1px);
+    background: #dfdfe0 !important;     /* keep same background on interaction */
+    transform: none; /* remove hover lift */
     box-shadow: none;
   }
-  #mobile-menu .mobile-follow__icons i { font-size: 28px; line-height: 1; }
+  #mobile-menu .mobile-follow__icons i { 
+    font-size: 28px; 
+    line-height: 1; 
+  }
 }
 .mobile-menu__backdrop { 
   display: none; 
