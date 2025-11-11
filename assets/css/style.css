@@ -30,6 +30,7 @@
   --nav-overlay: rgba(2, 6, 23, 0.25); /* cool, slate-tinted overlay */
 }
 
+
 /* Final: remove all interactive effects on mobile menu links */
 @media (max-width: 767.98px) {
   #mobile-menu.open,
@@ -120,6 +121,35 @@
     color: var(--primary) !important;
   }
 }
+
+/* Robust mobile menu overlay sizing and scroll lock (final override) */
+@media (max-width: 767.98px) {
+  /* Lock background scroll defensively when menu is open */
+  body.nav-open {
+    overflow: hidden !important;
+    overscroll-behavior: contain;
+    touch-action: none;
+  }
+
+  /* Ensure full, stable viewport height using real-vh var with dvh fallback */
+  .mobile-menu.open,
+  .mobile-menu.active,
+  #mobile-menu.open,
+  #mobile-menu.active {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: calc(var(--real-vh, 1dvh) * 100) !important;
+    min-height: calc(var(--real-vh, 1dvh) * 100) !important;
+    box-sizing: border-box !important;
+    padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
 
 /* Base reset and media */
 * { 
@@ -754,11 +784,6 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.875rem; 
   margin: 0; 
 }
-
-
-
-
-
 
 
 /* Pricing */

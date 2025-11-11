@@ -1,16 +1,62 @@
 ﻿// Initialize interactions after the DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+  // Robust viewport height variable for mobile (avoids iOS 100vh issues)
+  const updateRealVh = () => {
+    try {
+      const vh = ((window.visualViewport && window.visualViewport.height) || window.innerHeight) * 0.01;
+      document.documentElement.style.setProperty('--real-vh', `${vh}px`);
+    } catch (_) {}
+  };
+  updateRealVh();
+  window.addEventListener('resize', updateRealVh, { passive: true });
+  window.addEventListener('orientationchange', updateRealVh, { passive: true });
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', updateRealVh, { passive: true });
   // Mobile menu toggle (drawer)
   const mobileMenuButton = document.querySelector('.mobile-toggle');
   const mobileMenu = document.querySelector('.mobile-menu');
   const mobileBackdrop = document.querySelector('.mobile-menu__backdrop');
+
+  // Body scroll locking helpers (fixes y-scroll and page shift)
+  let scrollLockY = 0;
+  const lockScroll = () => {
+    try {
+      scrollLockY = Math.max(window.scrollY || window.pageYOffset || 0, 0);
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollLockY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+      document.body.classList.add('nav-open');
+    } catch (_) {}
+  };
+  const unlockScroll = () => {
+    try {
+      document.body.classList.remove('nav-open');
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      const y = scrollLockY || 0;
+      window.scrollTo(0, y);
+    } catch (_) {}
+  };
 
   const setMobileState = (open) => {
     if (!mobileMenuButton || !mobileMenu) return;
     mobileMenu.classList.toggle('open', open);
     mobileMenuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
     mobileMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
-    document.body.style.overflow = open ? 'hidden' : '';
+    // Use robust body scroll lock to prevent background scroll/jump
+    if (open) {
+      lockScroll();
+    } else {
+      unlockScroll();
+    }
     if (!open) {
       mobileMenuButton.focus();
     }
