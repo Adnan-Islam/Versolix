@@ -303,6 +303,12 @@ h1, h2, h3, h4, h5, h6 {
   transition: opacity 150ms ease, transform 150ms ease;
   visibility: hidden; /* prevent any flash when not open */
 }
+.mobile-menu,
+#mobile-menu {
+  box-sizing: border-box;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
 .mobile-menu.open { 
   pointer-events: auto; 
   opacity: 1; 
@@ -320,7 +326,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Mobile: Follow us block inside mobile drawer */
 @media (max-width: 767.98px) {
   #mobile-menu .mobile-follow {
-    margin-top: 10rem;
+    margin-top: 5rem;
     padding: 1.5rem;
     border-top: 1px solid var(--nav-border);
     display: flex;
@@ -328,9 +334,11 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     gap: 1rem;
     background: var(--nav-bg);
+    overflow: hidden;
   }
   #mobile-menu .mobile-follow__title {
     font-size: 1.5rem;
+    font-weight: bold;
     text-align: center;
     font-weight: 600;
     color: var(--nav-fg);
@@ -338,18 +346,18 @@ h1, h2, h3, h4, h5, h6 {
   }
   #mobile-menu .mobile-follow__icons {
     display: flex;
-    gap: 2rem; /* more space between icons */
+    gap: 1.5rem; /* more space between icons */
   }
 
   #mobile-menu .mobile-follow__icons a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 45px !important;   /* XL touch target */
-    height: 45px !important;  /* XL touch target */
+    width: 60px !important;   /* XL touch target */
+    height: 60px !important;  /* XL touch target */
     border-radius: 9999px !important; /* ensure circular */
     color: var(--primary);
-    background: #dfdfe0 !important;     /* light gray background */
+    background: white !important;     /* light gray background */
     border: 0;               /* no border */
     text-decoration: none;
     box-shadow: none;        /* no shadow */
@@ -367,6 +375,28 @@ h1, h2, h3, h4, h5, h6 {
   #mobile-menu .mobile-follow__icons i { 
     font-size: 28px; 
     line-height: 1; 
+  }
+}
+
+/* Mobile menu: prevent X/Y overflow on small screens */
+@media (max-width: 767.98px) {
+  .mobile-menu,
+  #mobile-menu {
+    width: 100vw;
+    max-width: 100vw;
+    max-height: calc(100dvh - var(--nav-h));
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .mobile-menu a,
+  #mobile-menu > a {
+    max-width: 100%;
+    word-break: break-word;
+    white-space: normal;
   }
 }
 .mobile-menu__backdrop { 
@@ -1260,8 +1290,8 @@ h1, h2, h3, h4, h5, h6 {
 .modal-body ul { margin: 0 0 .75rem 1rem; color: #111827; }
 
 
-/* === Mobile Nav Override: Force Full-Screen Overlay === */
-@media (max-width: 575.98px) {
+/* === Mobile Nav Override: Force Full-Screen Overlay (<= 767px) === */
+@media (max-width: 767.98px) {
   .nav-menu.open,
   .nav-menu.active,
   .navbar-nav.open,
@@ -1281,7 +1311,8 @@ h1, h2, h3, h4, h5, h6 {
     top: 0 !important;
     bottom: 0 !important;
     width: 100vw !important;
-    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
     background: #ffffff !important;
     box-shadow: none !important;
     z-index: 9999 !important;
@@ -1291,11 +1322,13 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center !important;
     gap: 20px !important;
     padding: 56px 20px 24px !important;
+    box-sizing: border-box !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
 }
-/* === Mobile Nav: Right-align items (full-screen) === */
-@media (max-width: 575.98px) {
+/* === Mobile Nav: Right-align items (full-screen) (<= 767px) === */
+@media (max-width: 767.98px) {
   .nav-menu.open,
   .nav-menu.active,
   .navbar-nav.open,
@@ -1331,7 +1364,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 /* === Mobile Nav: Pin close (×) to top-right === */
-@media (max-width: 575.98px) {
+@media (max-width: 767.98px) {
   .nav-menu .nav-close,
   .mobile-menu .nav-close,
   .navbar-nav .nav-close {
@@ -1800,7 +1833,8 @@ h1, h2, h3, h4, h5, h6 {
     position: fixed !important;
     inset: 0 !important;
     width: 100vw !important;
-    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
     background: #ffffff !important;
     z-index: 9999 !important;
     display: flex !important;
@@ -1810,6 +1844,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 96px 20px 24px !important; /* leave space for close (×) */
     gap: 20px !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     box-shadow: none !important;
   }
 

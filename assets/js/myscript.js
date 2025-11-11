@@ -457,6 +457,32 @@ document.addEventListener('DOMContentLoaded', () => {
   initSlider('cap');
   initSlider('pricing');
   initSlider('why');
+
+  // Ensure delivery video autoplays inline on iOS
+  const deliveryVideo = document.querySelector('.delivery-video');
+  if (deliveryVideo) {
+    try {
+      deliveryVideo.muted = true;
+      deliveryVideo.setAttribute('muted', '');
+      deliveryVideo.setAttribute('playsinline', '');
+      deliveryVideo.setAttribute('webkit-playsinline', '');
+    } catch (_) {}
+    const attemptPlay = () => {
+      try {
+        const p = deliveryVideo.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      } catch (_) {}
+    };
+    // Try immediately and when visible
+    attemptPlay();
+    if ('IntersectionObserver' in window) {
+      const section = deliveryVideo.closest('.delivery') || deliveryVideo;
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) attemptPlay(); });
+      }, { threshold: 0.2 });
+      obs.observe(section);
+    }
+  }
 });
 // Mobile nav: close handler for full-screen overlay + auto-injected close button
 (function () {
