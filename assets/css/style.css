@@ -156,10 +156,15 @@
   box-sizing: 
   border-box; 
 }
-html, body { 
-  margin: 0; 
-  padding: 0; 
-  overflow-x: hidden; 
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  /* Ensure vertical scrolling is always enabled on mobile */
+  overflow-y: auto;
+  height: auto;
+  min-height: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 img, video { 
   max-width: 100%; 
@@ -482,10 +487,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Hero */
-.hero { 
+.hero {
   padding-top: var(--nav-h); 
   background: #ffffff; 
-  min-height: 100vh; 
+  /* Use real viewport height to avoid iOS 100vh bugs */
+  min-height: calc(var(--real-vh, 1dvh) * 100);
   display: flex; 
   align-items: center; 
 }

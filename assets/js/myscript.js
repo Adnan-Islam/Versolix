@@ -45,6 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
       window.scrollTo(0, y);
     } catch (_) {}
   };
+  // Expose for other modules/handlers that also close the menu
+  try {
+    window.__lockBodyScroll = lockScroll;
+    window.__unlockBodyScroll = unlockScroll;
+  } catch (_) {}
 
   const setMobileState = (open) => {
     if (!mobileMenuButton || !mobileMenu) return;
@@ -61,6 +66,29 @@ document.addEventListener('DOMContentLoaded', () => {
       mobileMenuButton.focus();
     }
   };
+
+  // Safety: ensure scroll is never stuck when the menu is closed
+  const ensureScrollUnlocked = () => {
+    try {
+      const menuIsOpen = !!(mobileMenu && mobileMenu.classList.contains('open'));
+      if (!menuIsOpen) {
+        document.body.classList.remove('nav-open', 'menu-open');
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        document.body.style.touchAction = '';
+      }
+    } catch (_) {}
+  };
+  // Run once on load and on viewport changes that commonly reveal issues
+  ensureScrollUnlocked();
+  window.addEventListener('resize', ensureScrollUnlocked, { passive: true });
+  window.addEventListener('orientationchange', ensureScrollUnlocked, { passive: true });
+  window.addEventListener('hashchange', ensureScrollUnlocked, { passive: true });
+  window.addEventListener('pageshow', ensureScrollUnlocked);
 
   if (mobileMenuButton && mobileMenu) {
     mobileMenuButton.addEventListener('click', () => {
@@ -566,9 +594,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clear body/header/nav open flags
     body.classList.remove('menu-open');
     body.classList.remove('nav-open');
+    try { if (window.__unlockBodyScroll) window.__unlockBodyScroll(); } catch (_) {}
     if (header) header.classList.remove('nav-open');
     var nav = document.querySelector('nav');
     if (nav) nav.classList.remove('open');
+    // Keep aria state consistent
+    try {
+      var mm = document.getElementById('mobile-menu') || document.querySelector('.mobile-menu');
+      var btn = document.querySelector('.mobile-toggle');
+      if (mm) {
+        mm.classList.remove('open', 'active', 'closing');
+        mm.setAttribute('aria-hidden', 'true');
+      }
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    } catch (_) {}
   }
 
   function bindNavCloseHandlers() {
@@ -661,8 +700,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reset global open flags right away
     body.classList.remove('menu-open', 'nav-open');
+    try { if (window.__unlockBodyScroll) window.__unlockBodyScroll(); } catch (_) {}
     if (header) header.classList.remove('nav-open');
     if (nav) nav.classList.remove('open');
+    // Ensure the controlled elements reflect closed state
+    try {
+      var mm2 = document.getElementById('mobile-menu') || document.querySelector('.mobile-menu');
+      var btn2 = document.querySelector('.mobile-toggle');
+      if (mm2) {
+        mm2.classList.remove('open', 'active', 'closing');
+        mm2.setAttribute('aria-hidden', 'true');
+      }
+      if (btn2) btn2.setAttribute('aria-expanded', 'false');
+    } catch (_) {}
 
     // Clear transient 'closing' class shortly after (no visual change)
     setTimeout(function () {
@@ -791,6 +841,7 @@ document.addEventListener('DOMContentLoaded', () => {
       el.classList.remove('open', 'active', 'closing');
     });
     body.classList.remove('menu-open', 'nav-open');
+    try { if (window.__unlockBodyScroll) window.__unlockBodyScroll(); } catch (_) {}
     if (header) header.classList.remove('nav-open');
     if (nav) nav.classList.remove('open');
   }
