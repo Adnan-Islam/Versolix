@@ -18,8 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Body scroll locking helpers (fixes y-scroll and page shift)
   let scrollLockY = 0;
+  let isScrollLocked = false;
   const lockScroll = () => {
     try {
+      if (isScrollLocked) return;
       scrollLockY = Math.max(window.scrollY || window.pageYOffset || 0, 0);
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollLockY}px`;
@@ -29,10 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
       document.body.classList.add('nav-open');
+      isScrollLocked = true;
     } catch (_) {}
   };
   const unlockScroll = () => {
     try {
+      if (!isScrollLocked) return;
       document.body.classList.remove('nav-open');
       document.body.style.position = '';
       document.body.style.top = '';
@@ -42,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
       const y = scrollLockY || 0;
+      isScrollLocked = false;
       window.scrollTo(0, y);
     } catch (_) {}
   };
@@ -90,6 +95,21 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('hashchange', ensureScrollUnlocked, { passive: true });
   window.addEventListener('pageshow', ensureScrollUnlocked);
 
+  const smoothScrollTo = (target) => {
+    if (!target || typeof target.scrollIntoView !== 'function') return;
+    try {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (_) {
+      // Older browsers (e.g., Safari < 15) don't support the options object
+      try {
+        target.scrollIntoView();
+      } catch (_) {}
+    }
+  };
+  try {
+    window.__smoothScrollTo = smoothScrollTo;
+  } catch (_) {}
+
   if (mobileMenuButton && mobileMenu) {
     mobileMenuButton.addEventListener('click', () => {
       const isOpen = !mobileMenu.classList.contains('open');
@@ -101,65 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape' && mobileMenu && mobileMenu.classList.contains('open')) setMobileState(false);
   });
 
-  // Smooth scrolling for in-page links
-  // Mobile drawer: close then scroll to target
-  document.querySelectorAll('a[href^="#"]:not([data-modal])').forEach(anchor => {
-    anchor.addEventListener('click', (e) => {
-      const href = anchor.getAttribute('href') || '';
-      if (href === '#' || href.trim() === '') return;
-
-      // If the link lives inside the mobile drawer, close and scroll
-      const inMobileMenu = anchor.closest('#mobile-menu') || anchor.closest('.mobile-menu');
-      if (inMobileMenu) {
-        e.preventDefault();
-        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
-        let target = null;
-        try { target = document.querySelector(href); } catch (_) { target = null; }
-        // Close via the centralized state setter
-        setMobileState(false);
-        // Sync nav indicator to this target immediately
-        if (Array.isArray(navLinks)) {
-          const navA = navLinks.find(a => (a.getAttribute('href') || '') === href);
-          navA && setActiveLink(navA);
-        }
-        // Scroll after a short tick so layout settles
-        if (target) {
-          setTimeout(() => {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            try { history.replaceState(null, '', href); } catch (_) {}
-            if (href === '#services') {
-              setTimeout(() => { target.classList.add('in-view'); }, 250);
-            }
-          }, 50);
-        }
-        return;
-      }
-
-      // For regular in-page links outside the mobile drawer, smooth scroll
-      let target = null;
-      try { target = document.querySelector(href); } catch (_) { target = null; }
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Sync nav indicator when clicking desktop nav links
-        if (Array.isArray(navLinks)) {
-          const navA = navLinks.find(a => (a.getAttribute('href') || '') === href);
-          navA && setActiveLink(navA);
-        }
-        try { history.replaceState(null, '', href); } catch (_) {}
-        if (mobileMenu) setMobileState(false);
-        if (href === '#services') {
-          setTimeout(() => { target.classList.add('in-view'); }, 250);
-        }
-      }
-    });
-  });
-
-  // Keep header style constant on scroll (no scrolled state)
-  const header = document.querySelector('.site-header');
-  if (header) header.classList.remove('scrolled');
-
-  // Pro nav indicator + active-link sync
+  // Pro nav indicator + active-link sync (declare early so other handlers can use it)
   const navLinksWrap = document.querySelector('.nav-links');
   const navLinks = Array.from(document.querySelectorAll('.nav-links .nav-link'));
   const indicator = document.querySelector('.nav-indicator');
@@ -202,6 +164,66 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Smooth scrolling for in-page links
+  // Mobile drawer: close then scroll to target
+  document.querySelectorAll('a[href^="#"]:not([data-modal])').forEach(anchor => {
+    anchor.addEventListener('click', (e) => {
+      const href = anchor.getAttribute('href') || '';
+      if (href === '#' || href.trim() === '') return;
+
+      // If the link lives inside the mobile drawer, close and scroll
+      const inMobileMenu = anchor.closest('#mobile-menu') || anchor.closest('.mobile-menu');
+      if (inMobileMenu) {
+        e.preventDefault();
+        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+        let target = null;
+        try { target = document.querySelector(href); } catch (_) { target = null; }
+        // Close via the centralized state setter
+        setMobileState(false);
+        // Sync nav indicator to this target immediately
+        if (Array.isArray(navLinks)) {
+          const navA = navLinks.find(a => (a.getAttribute('href') || '') === href);
+          navA && setActiveLink(navA);
+        }
+        // Scroll after a short tick so layout settles
+        if (target) {
+          setTimeout(() => {
+            smoothScrollTo(target);
+            try { history.replaceState(null, '', href); } catch (_) {}
+            if (href === '#services') {
+              setTimeout(() => { target.classList.add('in-view'); }, 250);
+            }
+          }, 50);
+        }
+        return;
+      }
+
+      // For regular in-page links outside the mobile drawer, smooth scroll
+      let target = null;
+      try { target = document.querySelector(href); } catch (_) { target = null; }
+      if (target) {
+        e.preventDefault();
+        smoothScrollTo(target);
+        // Sync nav indicator when clicking desktop nav links
+        if (Array.isArray(navLinks)) {
+          const navA = navLinks.find(a => (a.getAttribute('href') || '') === href);
+          navA && setActiveLink(navA);
+        }
+        try { history.replaceState(null, '', href); } catch (_) {}
+        if (mobileMenu && mobileMenu.classList.contains('open')) {
+          setMobileState(false);
+        }
+        if (href === '#services') {
+          setTimeout(() => { target.classList.add('in-view'); }, 250);
+        }
+      }
+    });
+  });
+
+  // Keep header style constant on scroll (no scrolled state)
+  const header = document.querySelector('.site-header');
+  if (header) header.classList.remove('scrolled');
+
   // Active link by section in view
   if ('IntersectionObserver' in window && navLinks.length) {
     const map = new Map();
@@ -228,19 +250,28 @@ document.addEventListener('DOMContentLoaded', () => {
   // Enhanced contact form UX (validation + inline messaging)
   const form = document.querySelector('.contact-form');
   if (form) {
+    const updateFieldState = (el) => {
+      if (!el) return;
+      const field = el.closest('.form-field');
+      if (!field) return;
+      const hasValue = (el.value || '').trim().length > 0;
+      field.classList.toggle('has-value', hasValue);
+    };
+
     // Hide placeholder icon/label when user types
     const attachValueStateHandlers = () => {
       form.querySelectorAll('.form-field .input').forEach((el) => {
-        const field = el.closest('.form-field');
-        if (!field) return;
-        const update = () => {
-          const hasValue = (el.value || '').trim().length > 0;
-          field.classList.toggle('has-value', hasValue);
-        };
-        // Initialize state (handles autofill/remembered values)
-        update();
-        el.addEventListener('input', update);
-        el.addEventListener('change', update);
+        updateFieldState(el);
+        el.addEventListener('input', () => updateFieldState(el));
+        el.addEventListener('change', () => updateFieldState(el));
+      });
+    };
+
+    const resetFormState = () => {
+      form.reset();
+      form.querySelectorAll('.form-field .input').forEach((el) => {
+        el.classList.remove('valid', 'invalid');
+        updateFieldState(el);
       });
     };
 
@@ -274,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return ok;
     };
 
-    [firstName, email, message].forEach((el) => {
+    [firstName, lastName, email, message].forEach((el) => {
       if (!el) return;
       el.addEventListener('blur', () => validateField(el));
       el.addEventListener('input', () => validateField(el));
@@ -307,9 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = false;
             submitBtn.innerHTML = submitBtn.dataset.original || original;
           }
-          // Optionally clear message only
-          if (message) message.value = '';
-          [firstName, email, message].forEach((el) => el && el.classList.remove('valid', 'invalid'));
+          resetFormState();
         }, 500);
       }
     });
@@ -746,7 +775,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (target) {
               setTimeout(function () {
                 try {
-                  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  var scrollHelper = (typeof window !== 'undefined' && typeof window.__smoothScrollTo === 'function')
+                    ? window.__smoothScrollTo
+                    : null;
+                  if (scrollHelper) {
+                    scrollHelper(target);
+                  } else if (target && typeof target.scrollIntoView === 'function') {
+                    try {
+                      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } catch (_) {
+                      target.scrollIntoView();
+                    }
+                  }
                   // Best-effort: sync top nav indicator to this hash
                   var navWrap = document.querySelector('.nav-links');
                   var navLinksArr = Array.prototype.slice.call(document.querySelectorAll('.nav-links .nav-link'));

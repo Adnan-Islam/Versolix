@@ -388,8 +388,8 @@ h1, h2, h3, h4, h5, h6 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 60px !important;   /* XL touch target */
-    height: 60px !important;  /* XL touch target */
+    width: 45px !important;   /* XL touch target */
+    height: 45px !important;  /* XL touch target */
     border-radius: 9999px !important; /* ensure circular */
     color: var(--primary);
     background: white !important;     /* light gray background */
@@ -432,6 +432,7 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 100%;
     word-break: break-word;
     white-space: normal;
+    font-weight: 700;
   }
 }
 .mobile-menu__backdrop { 
@@ -525,7 +526,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 1.5rem;
   font-size: 1.2rem; 
   color: #000; 
-  line-height: 1.7; 
+  line-height: 1.5; 
 }
 .hero-ctas { 
   margin-top: 2rem; 
@@ -918,6 +919,10 @@ h1, h2, h3, h4, h5, h6 {
 .input:focus { 
   border-color: var(--secondary); 
   box-shadow: 0 0 0 4px rgba(122,28,172,0.12); 
+}
+.contact .input:focus {
+  border-color: var(--green-600);
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12);
 }
 .textarea { 
   resize: vertical; 
